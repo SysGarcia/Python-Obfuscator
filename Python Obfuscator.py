@@ -63,32 +63,7 @@ def analyze_code(code: str) -> dict:
 
 # Example usage
 code = """
-# Example Python script with classes, functions, and variables
-
-class Greeter:
-    def __init__(self, name):
-        self.name = name  # Instance variable
-
-    def greet(self):
-        \"\"\"Print a greeting message.\"\"\"
-        print(f"Hello, {self.name}!")
-
-def print_message():
-    # Print a welcome message
-    message = "Welcome to the world of Python!"
-    print(message)
-
-def add_numbers(num1, num2):
-    return num1 + num2
-
-# Create a Greeter object
-greeter = Greeter("Alice")
-greeter.greet()
-
-# Call functions
-print_message()
-result = add_numbers(5, 3)
-print(f"The sum is: {result}")
+Here goes your code #
 """
 code.replace("\n","\\n")
 
