@@ -2,7 +2,6 @@ import ast
 import itertools
 import random
 import re
-import string
 
 class CodeAnalyzer(ast.NodeVisitor):
     """
@@ -61,13 +60,7 @@ def analyze_code(code: str) -> dict:
     analyzer.visit(tree)
     return analyzer.report()
 
-# Example usage
-code = """
-Here goes your code #
-"""
-code.replace("\n","\\n")
-
-def get_funny_strings(VarAprox:int ,level_of_obfuscation: int) -> list:
+def get_funny_strings(level_of_obfuscation: int) -> list:
     """
     Generates a list of obfuscated strings.
 
@@ -81,12 +74,36 @@ def get_funny_strings(VarAprox:int ,level_of_obfuscation: int) -> list:
         yield from itertools.product(*([obfus_chars] * level_of_obfuscation)) 
 
     all_possible_combinations = []
-    letter_choices=["I","R","G","B","M","A"]
     for x in length_strings('0O'):
-        all_possible_combinations.append(random.choice(letter_choices)+''.join(x))
-        if len(all_possible_combinations) == VarAprox:
-            break
+        all_possible_combinations.append("I"+''.join(x))
     return all_possible_combinations
+
+code = """
+class BankAccount:
+    def __init__(self, account_number, balance=0):
+        self.account_number = account_number
+        self.balance = balance
+
+    def deposit(self, amount):
+        self.balance += amount
+        return self.balance
+
+    def withdraw(self, amount):
+        if amount > self.balance:
+            return "Insufficient funds"
+        self.balance -= amount
+        return self.balance
+
+    def get_balance(self):
+        return self.balance
+
+# Usage
+account = BankAccount("12345678")
+account.deposit(1000)
+print(account.withdraw(500))
+print(account.get_balance())
+"""
+code.replace("\n","\\n")
 
 found_items = analyze_code(code)
 
@@ -98,10 +115,10 @@ def replacements(found_items: dict) -> dict:
     Parameters:
     found_items (dict): A dictionary containing sets of elements to obfuscate.
 
-    Returns:
+    Returns:º
     dict: A dictionary mapping original names to obfuscated names.
     """
-    funny_strings = get_funny_strings(200,100)
+    funny_strings = get_funny_strings(18)
     dict_with_replacements = {}
     
     # Exclude magic methods (like __init__, __str__, etc.)
@@ -120,6 +137,21 @@ def replacements(found_items: dict) -> dict:
     
     return dict_with_replacements
 
+def generate_random_comment():
+    comments = [
+        "# Interesting approach, line 16",
+        "# Optimizing performance  line 96",
+        "# This part is crucial  line 32",
+        "# Generated comment  line 125",
+        "# Placeholder comment  line 112",
+        "# TODO: Review this later  line 178",
+        "# This might need refactoring  line 224",
+        "# Why was this done this way?  line 122",
+        "# Magic happens here  line 4",
+        "# Be careful with this part  line 1"
+    ]
+    return random.choice(comments)
+
 def rename_elements(code, replacements):
     """
     This function renames elements in the provided Python code. It ensures that
@@ -136,9 +168,22 @@ def rename_elements(code, replacements):
       in the replacements dictionary.
     """
     pattern = r'\b(' + '|'.join(re.escape(key) for key in replacements.keys()) + r')\b'
+    
+    lines_of_code = code.split('\n')
+    new_lines = []
 
+    for line in lines_of_code:
+        # Randomly decide whether to insert a comment on this line
+        if random.random() < 0.3:  # Adjust the probability as needed
+            # Insert a comment before the line
+            new_lines.append(generate_random_comment())
+        new_lines.append(line)
+    print(new_lines)
+    
+    code_with_comments = '\n'.join(new_lines)
+    
     # Replace all occurrences of names in the code based on the replacements dictionary
-    return re.sub(pattern, lambda m: replacements.get(m.group(0), m.group(0)), code)
+    return re.sub(pattern, lambda m: replacements.get(m.group(0), m.group(0)), code_with_comments)
 
 replacements_dict = replacements(found_items)
 new_code = rename_elements(code, replacements_dict)
