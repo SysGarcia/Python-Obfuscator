@@ -153,32 +153,18 @@ def generate_random_comment():
     return random.choice(comments)
 
 def rename_elements(code, replacements):
-    """
-    This function renames elements in the provided Python code. It ensures that
-    only specific elements (like variable names, function names, etc.) are renamed,
-    while string literals remain unchanged.
-
-    Parameters:
-    - code (str): The Python source code as a string.
-    - replacements (dict): A dictionary where each key is an original name in the code
-      that needs to be replaced, and its value is the new name for that element.
-
-    Returns:
-    - str: The modified Python source code with elements renamed as specified
-      in the replacements dictionary.
-    """
     pattern = r'\b(' + '|'.join(re.escape(key) for key in replacements.keys()) + r')\b'
     
     lines_of_code = code.split('\n')
     new_lines = []
 
     for line in lines_of_code:
+        line_without_comments = re.sub(r'#.*', '', line)
         # Randomly decide whether to insert a comment on this line
         if random.random() < 0.3:  # Adjust the probability as needed
             # Insert a comment before the line
             new_lines.append(generate_random_comment())
-        new_lines.append(line)
-    print(new_lines)
+        new_lines.append(line_without_comments)
     
     code_with_comments = '\n'.join(new_lines)
     
