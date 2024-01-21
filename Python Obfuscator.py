@@ -79,32 +79,10 @@ def get_funny_strings(level_of_obfuscation: int) -> list:
     return all_possible_combinations
 
 code = """
-class BankAccount:
-    def __init__(self, account_number, balance=0):
-        self.account_number = account_number
-        self.balance = balance
+a = "#Zxc"
+print(a) #zxcased
 
-    def deposit(self, amount):
-        self.balance += amount
-        return self.balance
-
-    def withdraw(self, amount):
-        if amount > self.balance:
-            return "Insufficient funds"
-        self.balance -= amount
-        return self.balance
-
-    def get_balance(self):
-        return self.balance
-
-# Usage
-account = BankAccount("12345678")
-account.deposit(1000)
-print(account.withdraw(500))
-print(account.get_balance())
 """
-code.replace("\n","\\n")
-
 found_items = analyze_code(code)
 
 def replacements(found_items: dict) -> dict:
@@ -152,6 +130,9 @@ def generate_random_comment():
     ]
     return random.choice(comments)
 
+code.replace("\n","\\n")
+code=ast.unparse(ast.parse(code))
+
 def rename_elements(code, replacements):
     pattern = r'\b(' + '|'.join(re.escape(key) for key in replacements.keys()) + r')\b'
     
@@ -159,12 +140,11 @@ def rename_elements(code, replacements):
     new_lines = []
 
     for line in lines_of_code:
-        line_without_comments = re.sub(r'#.*', '', line)
         # Randomly decide whether to insert a comment on this line
         if random.random() < 0.3:  # Adjust the probability as needed
             # Insert a comment before the line
             new_lines.append(generate_random_comment())
-        new_lines.append(line_without_comments)
+        new_lines.append(line)
     
     code_with_comments = '\n'.join(new_lines)
     
